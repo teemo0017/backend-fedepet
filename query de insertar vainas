@@ -1,0 +1,10 @@
+INSERT INTO bienes.categorias (nombre, descripcion)
+VALUES
+    ('Electrónica', 'Dispositivos electrónicos como laptops, teléfonos y más.'),
+    ('Mobiliario', 'Muebles para oficinas y salas de reuniones.'),
+    ('Vehículos', 'Automóviles, motocicletas y otros vehículos del estado.'),
+    ('Equipos de Oficina', 'Equipos como impresoras, proyectores, etc.'),
+    ('Materiales de Construcción', 'Herramientas y materiales de construcción.'),
+    ('Instrumentos Médicos', 'Equipos médicos y de diagnóstico.'),
+    ('Infraestructura', 'Edificios y propiedades inmobiliarias.'),
+    ('Tecnología', 'Servidores, redes y otros equipos tecnológicos.');
