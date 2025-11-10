@@ -1,4 +1,4 @@
-package com.api.crud.SecurityConfig;
+package com.api.crud.config.SecurityConfig;
 
 import com.api.crud.repositories.repo.IUserRepository;
 import lombok.RequiredArgsConstructor;

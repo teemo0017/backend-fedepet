@@ -23,6 +23,8 @@ public class PetRegistration implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String photo;
+    
     @Column(nullable = false, length = 100)
     private String name;
 

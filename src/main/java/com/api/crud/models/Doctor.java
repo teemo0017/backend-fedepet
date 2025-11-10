@@ -21,6 +21,7 @@ public class Doctor {
     private String specialty;
     private String email;
     private String phone;
+    private String photo;
     private boolean available = true;
 
     @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL)

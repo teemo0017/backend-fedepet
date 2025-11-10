@@ -26,18 +26,20 @@ public class JwtService {
     IUserRepository userRepository;
 
     public String getToken(UserInfo user) {
-        return getToken(new HashMap<>(), user);
+        Map<String, Object> eClaims = new HashMap<>();
+        eClaims.put("id", user.getId());
+        eClaims.put("name", user.getName());
+        eClaims.put("phone", user.getPhone());
+        eClaims.put("role", user.getRole());
+        return getToken(eClaims, user);
     }
 
 
     private String getToken(Map<String, Object> extraClaims, UserInfo user) {
-
-        //User id = this.userRepository.findByEmail(user.getUsername());
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
                 .setSubject(user.getEmail())
-                //.setId(id.toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
                 .signWith(getKey(), SignatureAlgorithm.HS256)

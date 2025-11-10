@@ -13,4 +13,5 @@ public class DoctorResponse implements Serializable {
     private String email;
     private String phone;
     private boolean available;
+    private String photo;
 }

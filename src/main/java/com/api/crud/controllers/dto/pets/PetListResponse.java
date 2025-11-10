@@ -9,9 +9,11 @@ import java.time.OffsetDateTime;
 @Data
 @Builder
 public class PetListResponse implements Serializable {
+    private Long id;
     private String name;
     private String species;
     private String breed;
     private OffsetDateTime dateBirth;
     private Double weight;
+    private String photo;
 }

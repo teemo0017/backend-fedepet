@@ -1,5 +1,6 @@
 package com.api.crud.repositories.services;
 
+import com.api.crud.config.services.impl.S3Impl;
 import com.api.crud.controllers.dto.pets.FindPetsRequest;
 import com.api.crud.controllers.dto.pets.PetListResponse;
 import com.api.crud.controllers.dto.pets.PetRegisterRequest;
@@ -19,11 +20,16 @@ import java.util.Optional;
 @Service
 public class PetRegistrationService implements IPetRegistrationService {
 
+    private final String BUCKET_NAME = "fedepet-imgs";
+    private final String INIT_PATH = "users";
     @Autowired
     private IPetRegistrationRepository petRepository;
 
     @Autowired
     private IUserRepository userRepository;
+
+    @Autowired
+    private S3Impl s3Service;
 
     @Override
     public List<PetListResponse> findAll() {
@@ -54,6 +60,7 @@ public class PetRegistrationService implements IPetRegistrationService {
                     .name(petDb.getName())
                     .species(petDb.getSpecies())
                     .weight(petDb.getWeight())
+                    .photo(petDb.getPhoto())
                     .build();
             petResponse.add(pet);
         }
@@ -62,16 +69,28 @@ public class PetRegistrationService implements IPetRegistrationService {
 
     @Override
     public void save(PetRegisterRequest pet) {
-        UserInfo finduser = userRepository.findById(pet.getOwner()).orElseThrow(() -> new RuntimeException("Responsable no encontrado con ID: " + pet.getOwner()));
-        PetRegistration petDB = PetRegistration.builder()
-                .breed(pet.getBreed())
-                .dateBirth((pet.getDateBirth()))
-                .user(finduser)
-                .weight(pet.getWeight())
-                .species(pet.getSpecies())
-                .name(pet.getName())
-                .build();
-        petRepository.save(petDB);
+        Long userId = pet.getOwner();
+        UserInfo findUser = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Responsable no encontrado con ID: " + pet.getOwner()));
+        String namePet = pet.getName();
+        String base64 = pet.getPhoto();
+        String pathAndNameFile = String.format("%s/%d/%s.png", INIT_PATH, userId, namePet);
+
+        Boolean uploadImg = s3Service.uploadFile(BUCKET_NAME, pathAndNameFile, base64);
+        if (uploadImg) {
+            String urlImg = String.format("https://fedepet-imgs.s3.us-east-1.amazonaws.com/%s/%d/%s.png", INIT_PATH, userId, namePet);
+            PetRegistration petDB = PetRegistration.builder()
+                    .breed(pet.getBreed())
+                    .dateBirth((pet.getDateBirth()))
+                    .user(findUser)
+                    .weight(pet.getWeight())
+                    .species(pet.getSpecies())
+                    .name(pet.getName())
+                    .photo(urlImg)
+                    .build();
+            petRepository.save(petDB);
+        }
+
+
     }
 
     @Override

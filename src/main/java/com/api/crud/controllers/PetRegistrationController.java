@@ -1,5 +1,7 @@
 package com.api.crud.controllers;
 
+import com.api.crud.config.services.impl.S3Impl;
+import com.api.crud.controllers.dto.SaveImgRequest;
 import com.api.crud.controllers.dto.pets.FindPetsRequest;
 import com.api.crud.controllers.dto.pets.PetListResponse;
 import com.api.crud.controllers.dto.pets.PetRegisterRequest;
@@ -10,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/pets")
@@ -18,6 +21,9 @@ public class PetRegistrationController {
 
     @Autowired
     private IPetRegistrationService petService;
+
+    @Autowired
+    private S3Impl s3Service;
 
     @GetMapping("/findall")
     public ResponseEntity<List<PetListResponse>> getAll() {
@@ -30,9 +36,12 @@ public class PetRegistrationController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<String> create(@RequestBody PetRegisterRequest pet) {
+    public ResponseEntity<Map<String, Object>> create(@RequestBody PetRegisterRequest pet) {
         petService.save(pet);
-        return ResponseEntity.ok("ok");
+        return ResponseEntity.ok(Map.of(
+                "status", "ok",
+                "message", "Pet saved"
+        ));
     }
 
     @PutMapping("/{id}")
@@ -44,5 +53,16 @@ public class PetRegistrationController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         petService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/createBucket")
+    public ResponseEntity<String> createBucket(@RequestParam String nameBucket) {
+        return ResponseEntity.ok(s3Service.createBucket(nameBucket));
+    }
+
+    @PostMapping("/saveimg")
+    public ResponseEntity<Boolean> saveImg(@RequestBody SaveImgRequest request) {
+
+        return ResponseEntity.ok(s3Service.uploadFile(request.getBucket(), request.getKey(), request.getBase64()));
     }
 }

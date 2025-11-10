@@ -13,4 +13,5 @@ public class PetRegisterRequest implements Serializable {
     private OffsetDateTime dateBirth;
     private Double weight;
     private Long owner;
+    private String photo;
 }
