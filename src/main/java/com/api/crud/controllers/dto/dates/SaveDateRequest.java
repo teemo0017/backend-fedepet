@@ -14,4 +14,5 @@ public class SaveDateRequest implements Serializable {
     private String state;
     private Long pet;
     private Long doctor;
+    private Long client;
 }

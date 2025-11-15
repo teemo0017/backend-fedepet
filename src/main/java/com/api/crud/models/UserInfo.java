@@ -38,6 +38,9 @@ public class UserInfo implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<PetRegistration> pets;
 
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    private List<UserInfo> dateId;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

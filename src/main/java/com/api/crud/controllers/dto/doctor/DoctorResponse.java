@@ -9,6 +9,8 @@ import java.io.Serializable;
 @Builder
 public class DoctorResponse implements Serializable {
     private String name;
+    private String namePet;
+    private String nameClient;
     private String specialty;
     private String email;
     private String phone;
