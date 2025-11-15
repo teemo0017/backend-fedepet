@@ -15,6 +15,7 @@ public class DateListResponse implements Serializable {
     private OffsetDateTime dateTime;
     private String motive;
     private String state;
-    private String Doctor;
+    private String doctor;
+    private String client;
     private String pet;
 }

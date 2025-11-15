@@ -6,10 +6,12 @@ import com.api.crud.controllers.dto.dates.SaveDateRequest;
 import com.api.crud.models.Dates;
 import com.api.crud.models.Doctor;
 import com.api.crud.models.PetRegistration;
+import com.api.crud.models.UserInfo;
 import com.api.crud.repositories.interfaces.IDatesService;
 import com.api.crud.repositories.repo.IDatesRepository;
 import com.api.crud.repositories.repo.IDoctorRepository;
 import com.api.crud.repositories.repo.IPetRegistrationRepository;
+import com.api.crud.repositories.repo.IUserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,8 @@ public class DatesService implements IDatesService {
     @Autowired
     private IDoctorRepository iDoctorRepository;
 
+    @Autowired
+    private IUserRepository iUserRepository;
 
     // 🔹 Buscar todas las citas por doctor
     @Transactional
@@ -55,7 +59,7 @@ public class DatesService implements IDatesService {
         List<DateListResponse> listResponse = new ArrayList<>();
         for (Dates datesdb : datesList) {
             DateListResponse resp = DateListResponse.builder()
-                    .Doctor(datesdb.getDoctor().getName())
+                    .doctor(datesdb.getDoctor().getName())
                     .dateTime(datesdb.getDateTime())
                     .motive(datesdb.getMotive())
                     .state(datesdb.getState())
@@ -66,14 +70,38 @@ public class DatesService implements IDatesService {
         return listResponse;
     }
 
+    // 🔹 Buscar todas las citas por mascota
+    @Transactional
+    public List<DateListResponse> getDatesByUser(FindDatesRequest findDatesRequest) {
+        List<Dates> datesList = iDatesRepository.findByClient(findDatesRequest.getId());
+        List<DateListResponse> listResponse = new ArrayList<>();
+        for (Dates datesdb : datesList) {
+            DateListResponse resp = DateListResponse.builder()
+                .doctor(datesdb.getDoctor().getName())
+                .pet(datesdb.getPet().getName())
+                .dateTime(datesdb.getDateTime())
+                .motive(datesdb.getMotive())
+                .state(datesdb.getState())
+                .build();
+
+            listResponse.add(resp);
+        }
+        return listResponse;
+    }
+
     public void save(SaveDateRequest request) {
         Doctor findDoctor = iDoctorRepository.findById(request.getDoctor()).orElseThrow(() -> new RuntimeException("Doctor no encontrado con ID: " + request.getDoctor()));
         PetRegistration findPet = iPetRegistrationRepository.findById(request.getPet()).orElseThrow(() -> new RuntimeException("Mascota no encontrado con ID: " + request.getPet()));
+        UserInfo findUser =
+            iPetRegistrationRepository.findByUserId(request.getClient()).orElseThrow(() -> new RuntimeException(
+                "Usuario" +
+                " no encontrado con ID: " + request.getPet()));
 
         Dates dates = Dates.builder()
                 .dateTime(request.getDateTime())
                 .doctor(findDoctor)
                 .pet(findPet)
+                .client(findUser)
                 .state(request.getState())
                 .motive(request.getMotive())
                 .build();

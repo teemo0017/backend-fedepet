@@ -1,5 +1,6 @@
 package com.api.crud.models;
 
+import com.api.crud.repositories.services.UserService;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,4 +29,8 @@ public class Dates {
     @ManyToOne
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;
+
+    @ManyToOne
+    @JoinColumn(name = "client_id")
+    private UserInfo client;
 }
