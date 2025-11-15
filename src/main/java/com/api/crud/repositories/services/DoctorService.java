@@ -35,6 +35,7 @@ public class DoctorService {
                     .specialty(doc.getSpecialty())
                     .phone(doc.getPhone())
                     .photo(doc.getPhoto())
+                    .id(doc.getId())
                     .build();
             doctorResponses.add(doctorResponse);
         }

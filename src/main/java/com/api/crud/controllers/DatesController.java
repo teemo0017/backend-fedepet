@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/dates")
@@ -19,9 +20,12 @@ public class DatesController {
     private DatesService iDatesService;
 
     @PostMapping("/create")
-    public ResponseEntity<String> create(@RequestBody SaveDateRequest date) {
+    public ResponseEntity<Map<String, Object>> create(@RequestBody SaveDateRequest date) {
         iDatesService.save(date);
-        return ResponseEntity.ok("ok");
+        return ResponseEntity.ok(Map.of(
+                "status", "ok",
+                "message", "Pet saved"
+        ));
     }
 
     @PostMapping("/findbypet")

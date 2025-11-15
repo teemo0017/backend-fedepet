@@ -61,6 +61,7 @@ public class PetRegistrationService implements IPetRegistrationService {
                     .species(petDb.getSpecies())
                     .weight(petDb.getWeight())
                     .photo(petDb.getPhoto())
+                    .id(petDb.getId())
                     .build();
             petResponse.add(pet);
         }
