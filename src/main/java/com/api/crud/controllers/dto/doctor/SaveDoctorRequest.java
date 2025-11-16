@@ -10,6 +10,7 @@ import java.io.Serializable;
 public class SaveDoctorRequest implements Serializable {
     private String name;
     private String specialty;
+    private String description;
     private String email;
     private String phone;
     private String photo;

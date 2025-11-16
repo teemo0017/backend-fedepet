@@ -39,7 +39,7 @@ public class UserInfo implements UserDetails {
     private List<PetRegistration> pets;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
-    private List<UserInfo> dateId;
+    private List<Dates> dates;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

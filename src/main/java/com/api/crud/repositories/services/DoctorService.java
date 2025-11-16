@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -32,6 +31,7 @@ public class DoctorService {
                     .email(doc.getEmail())
                     .available(doc.isAvailable())
                     .name(doc.getName())
+                    .description(doc.getDescription())
                     .specialty(doc.getSpecialty())
                     .phone(doc.getPhone())
                     .photo(doc.getPhoto())
@@ -40,10 +40,6 @@ public class DoctorService {
             doctorResponses.add(doctorResponse);
         }
         return doctorResponses;
-    }
-
-    public Optional<Doctor> getDoctorById(Long id) {
-        return doctorRepository.findById(id);
     }
 
     public void saveDoctor(SaveDoctorRequest request) {
@@ -55,6 +51,7 @@ public class DoctorService {
             Doctor doctor = Doctor.builder()
                     .phone(request.getPhone())
                     .available(true)
+                    .description(request.getDescription())
                     .specialty(request.getSpecialty())
                     .email(request.getEmail())
                     .name(request.getName())

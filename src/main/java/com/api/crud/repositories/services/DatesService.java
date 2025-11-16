@@ -41,12 +41,15 @@ public class DatesService implements IDatesService {
         List<DateListResponse> listResponse = new ArrayList<>();
         for (Dates datesdb : datesList) {
             DateListResponse resp = DateListResponse.builder()
+                    .id(datesdb.getId())
+                    .petImg(datesdb.getPet().getPhoto())
                     .pet(datesdb.getPet().getName())
+                    .client(datesdb.getClient().getName())
+                    .type(datesdb.getType())
                     .dateTime(datesdb.getDateTime())
                     .motive(datesdb.getMotive())
                     .state(datesdb.getState())
                     .build();
-
             listResponse.add(resp);
         }
         return listResponse;
@@ -70,20 +73,25 @@ public class DatesService implements IDatesService {
         return listResponse;
     }
 
-    // 🔹 Buscar todas las citas por mascota
+    // 🔹 Buscar todas las citas por Usuario
     @Transactional
     public List<DateListResponse> getDatesByUser(FindDatesRequest findDatesRequest) {
-        List<Dates> datesList = iDatesRepository.findByClient(findDatesRequest.getId());
+        List<Dates> datesList = iDatesRepository.findByClientId(findDatesRequest.getId());
+
         List<DateListResponse> listResponse = new ArrayList<>();
         for (Dates datesdb : datesList) {
             DateListResponse resp = DateListResponse.builder()
-                .doctor(datesdb.getDoctor().getName())
-                .pet(datesdb.getPet().getName())
-                .dateTime(datesdb.getDateTime())
-                .motive(datesdb.getMotive())
-                .state(datesdb.getState())
-                .build();
-
+                    .id(datesdb.getId())
+                    .type(datesdb.getType())
+                    .doctor(datesdb.getDoctor().getName())
+                    .doctorSpeciality(datesdb.getDoctor().getSpecialty())
+                    .doctorImg(datesdb.getDoctor().getPhoto())
+                    .petImg(datesdb.getPet().getPhoto())
+                    .pet(datesdb.getPet().getName())
+                    .dateTime(datesdb.getDateTime())
+                    .motive(datesdb.getMotive())
+                    .state(datesdb.getState())
+                    .build();
             listResponse.add(resp);
         }
         return listResponse;
@@ -93,16 +101,17 @@ public class DatesService implements IDatesService {
         Doctor findDoctor = iDoctorRepository.findById(request.getDoctor()).orElseThrow(() -> new RuntimeException("Doctor no encontrado con ID: " + request.getDoctor()));
         PetRegistration findPet = iPetRegistrationRepository.findById(request.getPet()).orElseThrow(() -> new RuntimeException("Mascota no encontrado con ID: " + request.getPet()));
         UserInfo findUser =
-            iPetRegistrationRepository.findByUserId(request.getClient()).orElseThrow(() -> new RuntimeException(
-                "Usuario" +
-                " no encontrado con ID: " + request.getPet()));
+                iUserRepository.findById(request.getClient()).orElseThrow(() -> new RuntimeException(
+                        "Usuario" +
+                                " no encontrado con ID: " + request.getPet()));
 
         Dates dates = Dates.builder()
                 .dateTime(request.getDateTime())
                 .doctor(findDoctor)
+                .type(request.getType())
                 .pet(findPet)
                 .client(findUser)
-                .state(request.getState())
+                .state("PENDIENTE")
                 .motive(request.getMotive())
                 .build();
         iDatesRepository.save(dates);

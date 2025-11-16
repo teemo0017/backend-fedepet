@@ -1,6 +1,5 @@
 package com.api.crud.models;
 
-import com.api.crud.repositories.services.UserService;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,11 +20,11 @@ public class Dates {
     private OffsetDateTime dateTime;
     private String motive;
     private String state;
-
+    private String type;
     @ManyToOne
     @JoinColumn(name = "pet_id")
     private PetRegistration pet;
-    
+
     @ManyToOne
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;

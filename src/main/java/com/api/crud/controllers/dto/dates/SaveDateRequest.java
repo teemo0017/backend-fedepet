@@ -11,7 +11,7 @@ import java.time.OffsetDateTime;
 public class SaveDateRequest implements Serializable {
     private OffsetDateTime dateTime;
     private String motive;
-    private String state;
+    private String type;
     private Long pet;
     private Long doctor;
     private Long client;

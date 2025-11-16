@@ -28,9 +28,9 @@ public class DatesController {
         ));
     }
 
-    @PostMapping("/findbypet")
-    public ResponseEntity<List<DateListResponse>> findByPet(@RequestBody FindDatesRequest req) {
-        return ResponseEntity.ok(iDatesService.getDatesByPet(req));
+    @PostMapping("/findbyclient")
+    public ResponseEntity<List<DateListResponse>> findByClient(@RequestBody FindDatesRequest req) {
+        return ResponseEntity.ok(iDatesService.getDatesByUser(req));
     }
 
     @PostMapping("/findbydoctor")
