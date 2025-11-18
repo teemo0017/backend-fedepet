@@ -3,6 +3,7 @@ package com.api.crud.controllers;
 import com.api.crud.controllers.dto.dates.DateListResponse;
 import com.api.crud.controllers.dto.dates.FindDatesRequest;
 import com.api.crud.controllers.dto.dates.SaveDateRequest;
+import com.api.crud.controllers.dto.dates.UpdateDateStatus;
 import com.api.crud.repositories.services.DatesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,15 @@ public class DatesController {
     @PostMapping("/create")
     public ResponseEntity<Map<String, Object>> create(@RequestBody SaveDateRequest date) {
         iDatesService.save(date);
+        return ResponseEntity.ok(Map.of(
+                "status", "ok",
+                "message", "Pet saved"
+        ));
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<Map<String, Object>> update(@RequestBody UpdateDateStatus request) {
+        iDatesService.updateStateDate(request);
         return ResponseEntity.ok(Map.of(
                 "status", "ok",
                 "message", "Pet saved"

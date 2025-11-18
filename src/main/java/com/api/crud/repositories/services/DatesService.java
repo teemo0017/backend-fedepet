@@ -3,6 +3,7 @@ package com.api.crud.repositories.services;
 import com.api.crud.controllers.dto.dates.DateListResponse;
 import com.api.crud.controllers.dto.dates.FindDatesRequest;
 import com.api.crud.controllers.dto.dates.SaveDateRequest;
+import com.api.crud.controllers.dto.dates.UpdateDateStatus;
 import com.api.crud.models.Dates;
 import com.api.crud.models.Doctor;
 import com.api.crud.models.PetRegistration;
@@ -54,6 +55,14 @@ public class DatesService implements IDatesService {
             listResponse.add(resp);
         }
         return listResponse;
+    }
+
+    // 🔹 Buscar todas las citas por doctor
+    @Transactional
+    public void updateStateDate(UpdateDateStatus request) {
+        Dates findDate = iDatesRepository.findById(request.getId()).orElseThrow(() -> new RuntimeException("Cita no encontrada con ID: " + request.getId()));
+        findDate.setState(request.getState());
+        iDatesRepository.save(findDate);
     }
 
     // 🔹 Buscar todas las citas por mascota
