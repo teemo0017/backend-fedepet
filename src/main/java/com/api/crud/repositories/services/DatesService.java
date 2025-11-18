@@ -37,7 +37,7 @@ public class DatesService implements IDatesService {
     // 🔹 Buscar todas las citas por doctor
     @Transactional
     public List<DateListResponse> getDatesByDoctor(Long doctorId) {
-        List<Dates> datesList = iDatesRepository.findByDoctorId(doctorId);
+        List<Dates> datesList = iDatesRepository.findByClientId(doctorId);
         List<DateListResponse> listResponse = new ArrayList<>();
         for (Dates datesdb : datesList) {
             DateListResponse resp = DateListResponse.builder()
