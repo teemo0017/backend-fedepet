@@ -41,6 +41,9 @@ public class UserInfo implements UserDetails {
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     private List<Dates> dates;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Doctor doctor;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

@@ -62,7 +62,7 @@ public class DatesService implements IDatesService {
         List<DateListResponse> listResponse = new ArrayList<>();
         for (Dates datesdb : datesList) {
             DateListResponse resp = DateListResponse.builder()
-                    .doctor(datesdb.getDoctor().getName())
+                    .doctor(datesdb.getDoctor().getUser().getName())
                     .dateTime(datesdb.getDateTime())
                     .motive(datesdb.getMotive())
                     .state(datesdb.getState())
@@ -83,7 +83,7 @@ public class DatesService implements IDatesService {
             DateListResponse resp = DateListResponse.builder()
                     .id(datesdb.getId())
                     .type(datesdb.getType())
-                    .doctor(datesdb.getDoctor().getName())
+                    .doctor(datesdb.getDoctor().getUser().getName())
                     .doctorSpeciality(datesdb.getDoctor().getSpecialty())
                     .doctorImg(datesdb.getDoctor().getPhoto())
                     .petImg(datesdb.getPet().getPhoto())
