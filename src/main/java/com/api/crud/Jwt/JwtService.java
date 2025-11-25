@@ -31,6 +31,9 @@ public class JwtService {
         eClaims.put("name", user.getName());
         eClaims.put("phone", user.getPhone());
         eClaims.put("role", user.getRole());
+        if (null != user.getDoctor()) {
+            eClaims.put("doctorPhoto", user.getDoctor().getPhoto());
+        }
         return getToken(eClaims, user);
     }
 

@@ -1,9 +1,6 @@
 package com.api.crud.repositories.services;
 
-import com.api.crud.controllers.dto.dates.DateListResponse;
-import com.api.crud.controllers.dto.dates.FindDatesRequest;
-import com.api.crud.controllers.dto.dates.SaveDateRequest;
-import com.api.crud.controllers.dto.dates.UpdateDateStatus;
+import com.api.crud.controllers.dto.dates.*;
 import com.api.crud.models.Dates;
 import com.api.crud.models.Doctor;
 import com.api.crud.models.PetRegistration;
@@ -18,10 +15,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
 public class DatesService implements IDatesService {
+    private static final List<String> STATES_DONE = new ArrayList<>(
+            Arrays.asList("CANCELADA", "FINALIZADA")
+    );
 
     @Autowired
     private IDatesRepository iDatesRepository;
@@ -37,24 +38,40 @@ public class DatesService implements IDatesService {
 
     // 🔹 Buscar todas las citas por doctor
     @Transactional
-    public List<DateListResponse> getDatesByDoctor(Long doctorId) {
+    public AllDatesDoctorResponse getDatesByDoctor(Long doctorId) {
+        AllDatesDoctorResponse response = new AllDatesDoctorResponse();
+        List<DateListResponse> datesIncoming = new ArrayList<>();
+        List<DateListResponse> datesDone = new ArrayList<>();
         Doctor findDoctor = iDoctorRepository.findByUserId(doctorId).orElseThrow(() -> new RuntimeException("Doctor no encontrado con ID: " + doctorId));
         List<Dates> datesList = iDatesRepository.findByDoctorId(findDoctor.getId());
-        List<DateListResponse> listResponse = new ArrayList<>();
-        for (Dates datesdb : datesList) {
-            DateListResponse resp = DateListResponse.builder()
-                    .id(datesdb.getId())
-                    .petImg(datesdb.getPet().getPhoto())
-                    .pet(datesdb.getPet().getName())
-                    .client(datesdb.getClient().getName())
-                    .type(datesdb.getType())
-                    .dateTime(datesdb.getDateTime())
-                    .motive(datesdb.getMotive())
-                    .state(datesdb.getState())
-                    .build();
-            listResponse.add(resp);
-        }
-        return listResponse;
+
+        datesList
+                .forEach((date) -> {
+                    if (STATES_DONE.contains(date.getState())) {
+                        datesDone.add(this.transformDate(date));
+                    } else {
+                        datesIncoming.add(this.transformDate(date));
+                    }
+                });
+        response.setDatesDone(datesDone);
+        response.setDatesIncoming(datesIncoming);
+
+        return response;
+    }
+
+    private DateListResponse transformDate(Dates datesdb) {
+        DateListResponse resp = DateListResponse.builder()
+                .id(datesdb.getId())
+                .petImg(datesdb.getPet().getPhoto())
+                .pet(datesdb.getPet().getName())
+                .client(datesdb.getClient().getName())
+                .type(datesdb.getType())
+                .dateTime(datesdb.getDateTime())
+                .motive(datesdb.getMotive())
+                .state(datesdb.getState())
+                .build();
+
+        return resp;
     }
 
     // 🔹 Buscar todas las citas por doctor

@@ -1,9 +1,6 @@
 package com.api.crud.controllers;
 
-import com.api.crud.controllers.dto.dates.DateListResponse;
-import com.api.crud.controllers.dto.dates.FindDatesRequest;
-import com.api.crud.controllers.dto.dates.SaveDateRequest;
-import com.api.crud.controllers.dto.dates.UpdateDateStatus;
+import com.api.crud.controllers.dto.dates.*;
 import com.api.crud.repositories.services.DatesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +41,7 @@ public class DatesController {
     }
 
     @PostMapping("/findbydoctor")
-    public ResponseEntity<List<DateListResponse>> findByDoctor(@RequestBody FindDatesRequest req) {
+    public ResponseEntity<AllDatesDoctorResponse> findByDoctor(@RequestBody FindDatesRequest req) {
         return ResponseEntity.ok(iDatesService.getDatesByDoctor(req.getId()));
     }
 }

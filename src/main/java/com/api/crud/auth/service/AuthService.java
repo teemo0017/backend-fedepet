@@ -36,7 +36,7 @@ public class AuthService {
         UserInfo userInfo = UserInfo.builder()
                 .name(request.getName())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .email(request.getEmail())
+                .email(request.getEmail().toLowerCase())
                 .role(request.getRole().equals("DOC") ? Role.DOCTOR : Role.USUARIO)
                 .phone(request.getPhone())
                 .build();
