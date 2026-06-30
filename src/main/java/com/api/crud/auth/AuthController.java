@@ -1,9 +1,10 @@
 package com.api.crud.auth;
 
 import com.api.crud.auth.dto.AuthResponse;
+import com.api.crud.auth.dto.GoogleAuthRequest;
 import com.api.crud.auth.dto.LoginRequest;
 import com.api.crud.auth.dto.RegisterRequest;
-import com.api.crud.auth.service.AuthService;
+import com.api.crud.common.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,18 +16,20 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final GoogleAuthService googleAuthService;
 
-
-    @PostMapping(value = "login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+    @PostMapping("login")
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody LoginRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok(authService.login(request)));
     }
 
-
-    @PostMapping(value = "register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authService.register(request));
+    @PostMapping("register")
+    public ResponseEntity<ApiResponse<AuthResponse>> register(@RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok(authService.register(request)));
     }
 
-
+    @PostMapping("google")
+    public ResponseEntity<ApiResponse<AuthResponse>> loginWithGoogle(@RequestBody GoogleAuthRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok(googleAuthService.loginWithGoogle(request)));
+    }
 }
