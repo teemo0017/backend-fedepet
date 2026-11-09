@@ -2,14 +2,79 @@
 
 ---
 
+## PARTE 0: ARQUITECTURA MULTI-TENANT CON SLUG
+
+### Decisiones de diseño tomadas
+
+#### Modelo de acceso
+Cada clínica tiene una URL propia basada en un slug único:
+```
+app.fedepet.com/clinica-san-francisco        ← portal dueños de mascotas
+app.fedepet.com/clinica-san-francisco/admin  ← panel del personal
+```
+
+El slug se asigna cuando el SUPER_ADMIN da de alta la clínica. Una vez asignado no cambia.
+
+#### Roles definidos
+| Rol | Quién es | Qué puede hacer |
+|---|---|---|
+| `SUPER_ADMIN` | El desarrollador (vos) | Crear y gestionar clínicas |
+| `ADMIN` | Dueño de la clínica | Gestionar doctores, ver estadísticas |
+| `DOCTOR` | Veterinario | Citas, historial médico |
+| `CLIENTE` | Dueño de la mascota | Ver sus mascotas, historial, pedir citas |
+
+#### Flujo de registro del dueño de mascota
+El dueño se registra **solo** — la clínica solo le comparte su URL:
+```
+1. Clínica le manda a Juan: "Registrate en app.fedepet.com/clinica-san-francisco"
+2. Juan entra y se registra con nombre, email y contraseña
+3. El backend extrae el slug de la URL → vincula a Juan con esa clínica automáticamente
+4. Juan queda con rol CLIENTE y solo ve sus propias mascotas y citas
+```
+El personal (doctores, recepción) lo crea el ADMIN de la clínica, no se auto-registran.
+
+#### Flujo de login con slug
+```
+POST /{slug}/auth/login
+→ backend resuelve slug a clinicId
+→ autentica email + password
+→ verifica que user.clinic.id == clinic.id (aislamiento entre clínicas)
+→ devuelve JWT con { clinicId, role }
+```
+
+#### Filtrado de datos por rol
+```java
+// En los services, el filtro cambia según el rol del JWT:
+CLIENTE  → solo sus mascotas:   findByOwnerIdAndClinicId(userId, clinicId)
+DOCTOR / ADMIN → todas:         findByClinicId(clinicId)
+```
+
+#### Lo que falta implementar
+- [x] Agregar campo `slug` a `Clinic.java` (único, inmutable)
+- [x] `ClinicRepository.findBySlug(String slug)`
+- [x] Cambiar `AuthController` a `@RequestMapping("/{slug}/auth")`
+- [x] `AuthService.login()` valida que user.clinic coincida con el slug
+- [x] `AuthService.register()` resuelve clinicId desde el slug (eliminar clinicId del body)
+- [x] Endpoint público sin JWT: `GET /{slug}/public/info` → nombre, logo, colores
+- [x] Renombrar rol `USUARIO` → `CLIENTE` para claridad
+- [ ] Filtros por rol en `PetService`, `AppointmentService`
+
+#### Estado actual del código base relevante
+- `TenantContext.java` — ya implementado con ThreadLocal, listo para usar
+- `JwtAuthenticatorFilter.java:53-56` — ya extrae clinicId del JWT y setea TenantContext
+- `JwtService.java:36-37` — ya incluye clinicId en el token
+- `AuthService.java:41-44` — recibe clinicId como UUID en el body (cambiar a slug)
+
+---
+
 ## PARTE 1: BACKEND — LO QUE FALTA
 
 ### 1.1 Correcciones críticas (1–2 días)
 
 | # | Tarea | Impacto |
 |---|-------|---------|
-| 1 | **Corregir expiración del JWT** — cambiar `1000 * 60 * 24` (24 min) a `1000 * 60 * 60` (1 hora) en `JwtService.java:48` | El usuario pierde sesión en 24 minutos |
-| 2 | **Mover SECRET_KEY a variable de entorno** — actualmente está hardcodeada en `JwtService.java:23`. Usar `@Value("${jwt.secret}")` y definirlo en `.env` | Vulnerabilidad de seguridad grave |
+| ✅ | **Corregir expiración del JWT** — `1000 * 60 * 60` (1 hora) en `JwtService.java` | El usuario pierde sesión en 24 minutos |
+| ✅ | **Mover SECRET_KEY a variable de entorno** — `@Value("${secret.key.jwt}")` leyendo de `.env` | Vulnerabilidad de seguridad grave |
 | 3 | **Validación de inputs** — agregar `@Valid` en controllers + anotaciones `@NotBlank`, `@Email`, `@Size` en todos los DTOs | Cualquiera puede enviar datos vacíos o malformados |
 
 **Ejemplo fix JWT secret:**
@@ -30,11 +95,11 @@ jwt.secret=${JWT_SECRET}
 **Por qué:** El access token dura 1 hora. Sin refresh token, el usuario debe re-loguearse cada hora.
 
 **Qué implementar:**
-1. Entidad `RefreshToken` — id, token (UUID), userId, expiresAt (7 días), revoked
+1. Entidad `RefreshToken` — id, token (UUID), userId, expiresAt (7 días), revoked *(archivos creados pero vacíos)*
 2. `RefreshTokenRepository` + `RefreshTokenService` (crear, validar, revocar)
 3. Actualizar `AuthResponse` para incluir `{ accessToken, refreshToken, expiresIn }`
-4. Nuevo endpoint `POST /auth/refresh` — recibe refreshToken, devuelve nuevo accessToken
-5. Nuevo endpoint `POST /auth/logout` — revoca el refreshToken
+4. Nuevo endpoint `POST /{slug}/auth/refresh` — recibe refreshToken, devuelve nuevo accessToken
+5. Nuevo endpoint `POST /{slug}/auth/logout` — revoca el refreshToken
 
 #### Paginación en listados
 Cualquier endpoint que devuelva una lista (`/api/pets`, `/api/appointments`, etc.) necesita paginación para no traer miles de registros.
@@ -102,7 +167,7 @@ AWS_REGION=us-east-1
 2. Apuntar el dominio a Railway (Railway provee SSL automático con Let's Encrypt)
 3. URL final: `https://api.fedepet.app`
 
----
+---co
 
 ### 2.4 Monitoreo básico
 
@@ -261,8 +326,11 @@ Antes de ir a vender, crea una clínica ficticia completa:
 ## RESUMEN EJECUTIVO
 
 ```
-SEMANAS 1–2:   Correcciones técnicas (JWT, validación, env vars)
-SEMANAS 3–4:   Refresh tokens + paginación + subida de imágenes
+✅ SEMANAS 1–2:   Correcciones técnicas (JWT ✅, env vars ✅, slug ✅)
+→  AHORA:         Filtros por rol (PetService, AppointmentService)
+                  Validación de inputs (@Valid en DTOs)
+                  Refresh tokens + logout
+SEMANAS 3–4:   Paginación + subida de imágenes
 SEMANAS 5–6:   Deploy en Railway + Vercel + dominio propio
 SEMANAS 7–8:   Clínica demo lista + material de ventas
 MES 2:         Primeras 30 visitas comerciales en Panama
