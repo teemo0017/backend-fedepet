@@ -17,7 +17,7 @@ public class AppointmentController {
     @Autowired
     private AppointmentService appointmentService;
 
-    @PreAuthorize("hasRole('USUARIO')")
+    @PreAuthorize("hasRole('CLIENTE')")
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<Void>> create(@RequestBody SaveDateRequest date) {
         appointmentService.save(date);
@@ -31,7 +31,7 @@ public class AppointmentController {
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
-    @PreAuthorize("hasAnyRole('USUARIO', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN')")
     @PostMapping("/findbyclient")
     public ResponseEntity<ApiResponse<List<DateListResponse>>> findByClient(@RequestBody FindDatesRequest req) {
         return ResponseEntity.ok(ApiResponse.ok(appointmentService.getDatesByUser(req)));

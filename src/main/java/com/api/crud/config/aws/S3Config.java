@@ -23,9 +23,10 @@ public class S3Config {
     @Bean
     public S3Client getS3Client() {
         AwsCredentials credentials = AwsBasicCredentials.create(awsAccessKey, secretKey);
+        Region awsRegion = Region.of(region);
         return S3Client.builder()
-                .region(Region.US_EAST_1)
-                .endpointOverride(URI.create("https://s3.us-east-1.amazonaws.com"))
+                .region(awsRegion)
+                .endpointOverride(URI.create("https://s3." + region + ".amazonaws.com"))
                 .credentialsProvider(StaticCredentialsProvider.create(credentials))
                 .build();
     }

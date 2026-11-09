@@ -25,7 +25,7 @@ public class DoctorController {
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'USUARIO')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENTE', 'DOCTOR')")
     @PostMapping("/findall")
     public ResponseEntity<ApiResponse<List<DoctorResponse>>> findAll() {
         return ResponseEntity.ok(ApiResponse.ok(doctorService.getAllDoctors()));

@@ -30,20 +30,20 @@ public class PetController {
         return ResponseEntity.ok(ApiResponse.ok(petService.findAll()));
     }
 
-    @PreAuthorize("hasAnyRole('USUARIO', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN')")
     @PostMapping("/findbyuser")
     public ResponseEntity<ApiResponse<List<PetListResponse>>> getAllByUser(@RequestBody FindPetsRequest req) {
         return ResponseEntity.ok(ApiResponse.ok(petService.findById(req)));
     }
 
-    @PreAuthorize("hasRole('USUARIO')")
+    @PreAuthorize("hasRole('CLIENTE')")
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<Void>> create(@RequestBody PetRegisterRequest pet) {
         petService.save(pet);
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
-    @PreAuthorize("hasAnyRole('USUARIO', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<PetRegistration>> update(@PathVariable Long id, @RequestBody PetRegistration pet) {
         return ResponseEntity.ok(ApiResponse.ok(petService.update(id, pet)));
@@ -56,7 +56,7 @@ public class PetController {
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
-    @PreAuthorize("hasAnyRole('USUARIO', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN')")
     @PostMapping("/saveimg")
     public ResponseEntity<ApiResponse<Boolean>> saveImg(@RequestBody SaveImgRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(s3Service.uploadFile(request.getBucket(), request.getKey(), request.getBase64())));
