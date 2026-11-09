@@ -37,7 +37,12 @@ public enum ResponseCode {
 
     // ── Seguridad ──────────────────────────────────────────
     UNAUTHORIZED("B12000", "No autorizado"),
-    INVALID_REQUEST("B13000", "Solicitud inválida");
+    INVALID_REQUEST("B13000", "Solicitud inválida"),
+
+    // ── Slug ───────────────────────────────────────────────
+    SLUG_NOT_FOUND("B14000", "Clínica no encontrada"),
+    CLINIC_MISMATCH("B15000", "El usuario no pertenece a esta clínica"),
+    SLUG_ALREADY_EXISTS("B16000", "El slug ya está en uso");
 
     private final String code;
     private final String message;

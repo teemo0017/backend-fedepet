@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 public class GoogleAuthService {
@@ -29,18 +27,20 @@ public class GoogleAuthService {
 
     private static final String GOOGLE_TOKENINFO_URL = "https://oauth2.googleapis.com/tokeninfo?id_token=";
 
-    public AuthResponse loginWithGoogle(GoogleAuthRequest request) {
+    public AuthResponse loginWithGoogle(String slug, GoogleAuthRequest request) {
+        Clinic clinic = clinicRepository.findBySlug(slug)
+                .orElseThrow(() -> new ApiException(ResponseCode.SLUG_NOT_FOUND));
+
         GoogleTokenInfo tokenInfo = verifyGoogleToken(request.getIdToken());
 
-        Clinic clinic = null;
-        if (request.getClinicId() != null) {
-            UUID clinicUUID = UUID.fromString(request.getClinicId());
-            clinic = clinicRepository.findById(clinicUUID).orElse(null);
-        }
-
-        final Clinic finalClinic = clinic;
         UserInfo user = userRepository.findByEmail(tokenInfo.getEmail())
-                .orElseGet(() -> createGoogleUser(tokenInfo, finalClinic));
+                .map(existing -> {
+                    if (existing.getClinic() == null || !existing.getClinic().getId().equals(clinic.getId())) {
+                        throw new ApiException(ResponseCode.CLINIC_MISMATCH);
+                    }
+                    return existing;
+                })
+                .orElseGet(() -> createGoogleUser(tokenInfo, clinic));
 
         return AuthResponse.builder().token(jwtService.getToken(user)).build();
     }
@@ -61,8 +61,8 @@ public class GoogleAuthService {
         UserInfo newUser = UserInfo.builder()
                 .name(tokenInfo.getName())
                 .email(tokenInfo.getEmail().toLowerCase())
-                .password(UUID.randomUUID().toString())
-                .role(Role.USUARIO)
+                .password(java.util.UUID.randomUUID().toString())
+                .role(Role.CLIENTE)
                 .clinic(clinic)
                 .build();
         return userRepository.save(newUser);

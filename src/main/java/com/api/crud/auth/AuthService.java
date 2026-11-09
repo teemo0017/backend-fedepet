@@ -29,26 +29,46 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    public AuthResponse login(LoginRequest request) {
+    public AuthResponse loginSuperAdmin(LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
-        UserInfo user = userRepository.findByEmail(request.getUsername()).orElseThrow();
+
+        UserInfo user = userRepository.findByEmail(request.getUsername())
+                .orElseThrow(() -> new ApiException(ResponseCode.USER_NOT_FOUND));
+
+        if (user.getRole() != Role.SUPER_ADMIN) {
+            throw new ApiException(ResponseCode.UNAUTHORIZED);
+        }
+
         return AuthResponse.builder().token(jwtService.getToken(user)).build();
     }
 
-    public AuthResponse register(RegisterRequest request) {
-        Clinic clinic = null;
-        if (request.getClinicId() != null) {
-            UUID clinicUUID = UUID.fromString(request.getClinicId());
-            clinic = clinicRepository.findById(clinicUUID)
-                    .orElseThrow(() -> new ApiException(ResponseCode.CLINIC_NOT_FOUND));
+    public AuthResponse login(String slug, LoginRequest request) {
+        Clinic clinic = clinicRepository.findBySlug(slug)
+                .orElseThrow(() -> new ApiException(ResponseCode.SLUG_NOT_FOUND));
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+
+        UserInfo user = userRepository.findByEmail(request.getUsername())
+                .orElseThrow(() -> new ApiException(ResponseCode.USER_NOT_FOUND));
+
+        if (user.getClinic() == null || !user.getClinic().getId().equals(clinic.getId())) {
+            throw new ApiException(ResponseCode.CLINIC_MISMATCH);
         }
+
+        return AuthResponse.builder().token(jwtService.getToken(user)).build();
+    }
+
+    public AuthResponse register(String slug, RegisterRequest request) {
+        Clinic clinic = clinicRepository.findBySlug(slug)
+                .orElseThrow(() -> new ApiException(ResponseCode.SLUG_NOT_FOUND));
 
         UserInfo userInfo = UserInfo.builder()
                 .name(request.getName())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .email(request.getEmail().toLowerCase())
-                .role(Role.USUARIO)
+                .role(Role.CLIENTE)
                 .phone(request.getPhone())
                 .clinic(clinic)
                 .build();

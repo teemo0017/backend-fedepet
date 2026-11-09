@@ -22,7 +22,7 @@ import java.util.function.Function;
 public class JwtService {
 
     @Value("${secret.key.jwt}")
-    private static String SECRET_KEY;
+    private String SECRET_KEY;
 
     @Autowired
     UserRepository userRepository;

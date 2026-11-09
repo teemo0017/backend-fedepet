@@ -25,8 +25,9 @@ public class SecurityConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/api/clinic/create").permitAll()
+                        .requestMatchers("/*/auth/**").permitAll()
+                        .requestMatchers("/*/public/**").permitAll()
+                        .requestMatchers("/super-admin/auth/login").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
