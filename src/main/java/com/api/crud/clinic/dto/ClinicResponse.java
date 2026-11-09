@@ -9,11 +9,12 @@ import java.util.UUID;
 @Builder
 public class ClinicResponse {
     private UUID id;
+    private String slug;
     private String name;
     private String address;
     private String phone;
     private String email;
     private String logo;
+    private String primaryColor;
     private boolean active;
-    private String adminToken;
 }

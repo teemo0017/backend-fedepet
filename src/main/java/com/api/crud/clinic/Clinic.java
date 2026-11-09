@@ -21,6 +21,9 @@ public class Clinic {
     @Column(columnDefinition = "uuid", updatable = false, nullable = false)
     private UUID id;
 
+    @Column(nullable = false, unique = true)
+    private String slug;
+
     @Column(nullable = false)
     private String name;
 
@@ -28,6 +31,9 @@ public class Clinic {
     private String phone;
     private String email;
     private String logo;
+
+    @Builder.Default
+    private String primaryColor = "#ffa420";
 
     @Builder.Default
     private boolean active = true;

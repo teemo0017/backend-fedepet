@@ -18,12 +18,13 @@ public class ClinicController {
 
     private final ClinicService clinicService;
 
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<ClinicResponse>> create(@RequestBody CreateClinicRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(clinicService.createClinic(request)));
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'USUARIO')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'DOCTOR', 'CLIENTE')")
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<ClinicResponse>> getMyClinic() {
         return ResponseEntity.ok(ApiResponse.ok(clinicService.getCurrentClinic()));
