@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Environment ###
+.env
+.env.*
+### .DS_Store ignore ###
+.DS_Store
