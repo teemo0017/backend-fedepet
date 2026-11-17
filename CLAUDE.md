@@ -39,7 +39,7 @@ Todos los `@PreAuthorize` de los controllers usan estos nombres exactos (`hasRol
 - `user/` — entidad `UserInfo`, enum `Role`
 - `clinic/` — entidad `Clinic` (slug, name, address, phone, email, logo, **primaryColor**, active), gestión de clínicas
 - `doctor/` — entidad `Doctor`, alta y listado de veterinarios (sin edición ni cambio de disponibilidad todavía)
-- `pet/` — entidad `Pet`, registro y gestión de mascotas
+- `pet/` — entidad `PetRegistration`, registro y gestión de mascotas. `PUT /api/pets/{id}` recibe la entidad completa como body (no un DTO dedicado) — `PetService.update()` solo reasigna name/species/breed/dateBirth/weight/photo, **nunca** el `user` (dueño), a propósito: el frontend no manda ese campo y no debe hacerlo, porque la entidad lo expone como `user: UserInfo` (objeto), no como un `owner` numérico — mandarlo como número nulearía el dueño de la mascota en cada edición (bug real, corregido 2026-11-17).
 - `appointment/` — entidad `Dates`, citas veterinarias, DTOs
 - `storage/` — integración con AWS S3
 - `tenant/` — contexto multi-tenant por request
@@ -71,6 +71,9 @@ Ver `.env` (no subir a git). Incluye credenciales de DB, JWT secret, AWS keys, G
 
 ## Gaps conocidos (ver `ROADMAP.md` para el plan completo)
 - Sin refresh tokens ni paginación en listados.
-- Sin `ProductController` (la tienda del frontend es solo mock).
+- Sin `ProductController` (la tienda del frontend es solo mock, y el tab correspondiente está oculto en el nav del cliente por eso mismo).
 - Sin endpoint de edición de doctor ni de cambio de disponibilidad.
+- Sin endpoint de edición/desactivación de clínica (solo alta y listado).
+- Sin `DELETE /api/pets/{id}` consumido desde el frontend — no hay listado de mascotas para ADMIN donde colgar esa acción (`GET /api/pets/findall` tampoco tiene consumidor todavía).
+- `PetService.update()` no sube la foto nueva a S3 (a diferencia de `save()`) — guarda el base64 crudo en la columna `photo` si el frontend manda uno nuevo en una edición. Inconsistente pero no roto.
 - Sin validación `@Valid`/`@NotBlank` en los DTOs de entrada.

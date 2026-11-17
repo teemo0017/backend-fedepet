@@ -33,6 +33,8 @@ Orden recomendado:
 6. Sin ambientes dev/prod separados — plan decidido (ver abajo), no implementado todavía.
 7. Integración de pagos — inexistente.
 
+**Auditoría funcional de 2026-11-17**: se cruzó cada endpoint del backend contra su consumo real en el frontend. Se encontró y corrigió un bug real en `PetService.update()` (ver `CLAUDE.md`) que hubiera puesto en `null` el dueño de cada mascota editada — no era solo un gap de feature, era un bug de corrupción de datos silencioso. Detalle completo de todo lo encontrado/corregido en `fedepet-frontend/CONTEXT.md`.
+
 ## Plan de ambientes dev/prod (decidido, no implementado)
 
 Para no gastar de más mientras no hay clientes pagando:
