@@ -102,7 +102,7 @@ public class PetService implements IPetService {
             updated.setBreed(pet.getBreed());
             updated.setDateBirth(pet.getDateBirth());
             updated.setWeight(pet.getWeight());
-            updated.setUser(pet.getUser());
+            updated.setPhoto(pet.getPhoto());
             return petRepository.save(updated);
         }
         throw new ApiException(ResponseCode.PET_NOT_FOUND);
